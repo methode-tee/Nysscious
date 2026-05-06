@@ -373,7 +373,13 @@ linear-gradient(
     </a>
     <div class="nav-right">
       <div class="nav-pages" id="nav-pages"></div>
-      <button class="nav-admin-btn" onclick="openAdmin()" title="Admin">❋</button>
+     <button 
+  class="nav-admin-btn hidden"
+  id="admin-btn"
+  onclick="openAdmin()"
+  title="Admin">
+  ❋
+</button>
     </div>
   </nav>
 
@@ -1271,6 +1277,19 @@ function importData(input){
 function resetData(){
   if(!confirm('Réinitialiser tout le contenu local ?')) return;
   localStorage.removeItem(SK); localStorage.removeItem(OLD_SK); _currentPage='accueil'; chargerAdmin(); renderApp();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
+    document.getElementById('admin-btn')?.classList.toggle('hidden');
+  }
+});
+
+if (
+  window.location.pathname === '/admin' ||
+  window.location.hash === '#admin'
+) {
+  document.getElementById('admin-btn')?.classList.remove('hidden');
 }
 </script>
 </body>
