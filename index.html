@@ -657,7 +657,8 @@ const eyebrow =
 fc.innerHTML = email
   ? `${escapeHTML(eyebrow)} · <a href="mailto:${attr(email)}">${escapeHTML(email)}</a>`
   : `${escapeHTML(eyebrow)}`;
-
+}
+  
 function renderHomePage(data){
   return `
     <section class="hero">
