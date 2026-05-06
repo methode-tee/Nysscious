@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -10,29 +10,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    :root{
-      --beige:#F5EFE6;
-      --beige2:#EDE4D8;
-      --white:#FDFAF6;
-      --ink:#1F1A15;
-      --ink2:#2D241E;
-      --brown:#6B4C3B;
-      --brown2:#8B6A55;
-      --gold:#C9A96E;
-      --gold2:#E2C98B;
-      --muted:#8C7B6E;
-      --border:rgba(107,76,59,.14);
-      --paper:#EAE0D0;
-      --shadow:0 18px 60px rgba(31,26,21,.10);
-      --radius:22px;
-      --safe-bottom:env(safe-area-inset-bottom);
-    }
+   :root{
+  --beige:#F7F1EA;
+  --beige2:#EFD7DA;
+  --white:#FFF9F5;
+  --ink:#2A1E1B;
+  --ink2:#3A2A25;
+  --brown:#6A4A3C;
+  --brown2:#8F6A60;
+  --gold:#C8A27A;
+  --gold2:#E6C7A3;
+  --muted:#9B7D83;
+  --border:rgba(106,74,60,.14);
+  --paper:#F3E4E6;
+  --shadow:0 18px 60px rgba(42,30,27,.10);
+  --radius:22px;
+  --safe-bottom:env(safe-area-inset-bottom);
+
+  --rose:#D8A7AE;
+  --rose-soft:#E8C7CC;
+  --rose-bg:#EFD7DA;
+}
 
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html{scroll-behavior:smooth}
     body{
       font-family:'Outfit',sans-serif;
-      background:var(--beige);
+      background:
+linear-gradient(
+  180deg,
+  #FFF9F5 0%,
+  #F7F1EA 35%,
+  #EFD7DA 100%
+);
       color:var(--ink);
       -webkit-font-smoothing:antialiased;
       overflow-x:hidden;
@@ -254,7 +264,7 @@
     .tarif-list{list-style:none;display:flex;flex-direction:column;gap:8px}
     .tarif-list li{font-size:12px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
     .tarif-card.featured .tarif-list li{color:rgba(245,239,230,.68)}
-    .tarif-list li:before{content:'✦';font-size:7px;color:var(--gold);flex-shrink:0;margin-top:5px}
+    .tarif-list li:before{content:'❋';font-size:7px;color:var(--gold);flex-shrink:0;margin-top:5px}
 
     .text-block{max-width:680px}
     .text-block p{font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:16px;white-space:pre-line}
@@ -364,7 +374,7 @@
     </a>
     <div class="nav-right">
       <div class="nav-pages" id="nav-pages"></div>
-      <button class="nav-admin-btn" onclick="openAdmin()" title="Admin">✦</button>
+      <button class="nav-admin-btn" onclick="openAdmin()" title="Admin">❋</button>
     </div>
   </nav>
 
@@ -387,7 +397,7 @@
   <div class="admin-overlay" id="admin-overlay" onclick="if(event.target===this) closeAdmin()">
     <div class="admin-panel">
       <div class="admin-header">
-        <h2>Admin ✦</h2>
+        <h2>Admin ❋</h2>
         <button class="admin-close" onclick="closeAdmin()">×</button>
       </div>
 
@@ -510,7 +520,7 @@ function normalizeData(d){
   d.pages = d.pages.map(p => {
     p.id = p.id || uid('page');
     p.nom = p.nom || 'Page';
-    p.icon = p.icon || '✦';
+    p.icon = p.icon || '❋';
     p.sections = Array.isArray(p.sections) ? p.sections : [];
     if(p.id === 'accueil') p.fixe = true;
     return p;
@@ -553,7 +563,7 @@ function defaultData(){
       { id:'conseils', nom:'Conseils', icon:'👩‍🍳', fixe:false, sections:[
         { id:uid('section'), type:'tips', titre:'Tips de cuisine', intro:'Conseils, organisation, conservation et petites astuces de cheffe.', tips:[] }
       ]},
-      { id:'tarifs', nom:'Tarifs & Contact', icon:'✦', fixe:false, sections:[
+      { id:'tarifs', nom:'Tarifs & Contact', icon:'❋', fixe:false, sections:[
         { id:uid('section'), type:'tarifs', titre:'Formules', intro:'Des formats adaptés aux envies, aux événements et aux budgets.', tarifs:[] },
         { id:uid('section'), type:'contact', titre:'Demander un devis', intro:'Décris ton projet, la date, le nombre de personnes et l’ambiance souhaitée.' }
       ]}
@@ -650,7 +660,7 @@ function renderHomePage(data){
         <p class="hero-bynissa">By Nissa</p>
         <p class="hero-sub">${escapeHTML(data.infos.heroSub)}</p>
         <div class="hero-actions">
-          <button class="hero-cta" onclick="scrollToFeed()">Voir le journal ✦</button>
+          <button class="hero-cta" onclick="scrollToFeed()">Voir le journal ❋</button>
           <button class="hero-cta-secondary" onclick="goToFirstContentPage()">Découvrir les créations</button>
         </div>
       </div>
@@ -686,7 +696,7 @@ function renderGenericPage(page){
           <div class="section-divider"></div>
         </div>
       </section>
-      ${sections.length ? sections.map(s => renderSection(s)).join('') : `<div class="section"><div class="empty"><span class="eicon">✦</span>Cette page est vide. Ajoute une section depuis l'admin.</div></div>`}
+      ${sections.length ? sections.map(s => renderSection(s)).join('') : `<div class="section"><div class="empty"><span class="eicon">❋</span>Cette page est vide. Ajoute une section depuis l'admin.</div></div>`}
     </div>
   `;
 }
@@ -856,7 +866,7 @@ function renderTipsSection(s){
 }
 function renderTarifsSection(s){
   const tarifs = s.tarifs || [];
-  if(!tarifs.length) return `<div class="empty"><span class="eicon">✦</span>Aucun tarif. Ajoute les formules depuis l'admin.</div>`;
+  if(!tarifs.length) return `<div class="empty"><span class="eicon">❋</span>Aucun tarif. Ajoute les formules depuis l'admin.</div>`;
   return `<div class="tarifs-grid">${tarifs.map(t => {
     const items = String(t.inclus || '').split('\n').filter(Boolean);
     return `<div class="tarif-card reveal ${t.featured ? 'featured' : ''}"><div class="tarif-nom">${escapeHTML(t.nom)}</div><p class="tarif-desc">${escapeHTML(t.description)}</p><span class="tarif-prix">${escapeHTML(t.prix)}</span><span class="tarif-unite">${escapeHTML(t.unite)}</span><ul class="tarif-list">${items.map(i => `<li>${escapeHTML(i.trim())}</li>`).join('')}</ul></div>`;
@@ -880,9 +890,9 @@ function renderContactSection(s){
         <input type="text" class="field-input" id="c-budget" placeholder="Ex: 250€" />
         <label class="field-label">Message</label>
         <textarea class="field-textarea" id="c-message" placeholder="Lieu, ambiance, envies, allergies, plats souhaités…"></textarea>
-        <button class="submit-btn" onclick="envoyerContact()">Envoyer ma demande ✦</button>
+        <button class="submit-btn" onclick="envoyerContact()">Envoyer ma demande ❋</button>
       </div>
-      <div class="success-msg" id="contact-ok"><div class="sicon">✦</div><h3>Message envoyé !</h3><p>Merci, je te réponds très vite pour donner vie à ton projet.</p></div>
+      <div class="success-msg" id="contact-ok"><div class="sicon">❋</div><h3>Message envoyé !</h3><p>Merci, je te réponds très vite pour donner vie à ton projet.</p></div>
     </div>`;
 }
 function renderTexteSection(s){
@@ -1120,7 +1130,7 @@ function chargerEditeurPage(pageId){
   const data = getData(); const page = data.pages.find(p=>p.id===pageId); if(!page) return;
   const wrap = document.getElementById('page-content-editor');
   const types = [
-    ['plats','🍽️ Plats'],['photos','📸 Photos/Vidéos'],['tips','💡 Tips'],['tarifs','✦ Tarifs'],['contact','✉️ Contact'],['texte','📝 Texte'],['liens','🔗 Liens']
+    ['plats','🍽️ Plats'],['photos','📸 Photos/Vidéos'],['tips','💡 Tips'],['tarifs','❋ Tarifs'],['contact','✉️ Contact'],['texte','📝 Texte'],['liens','🔗 Liens']
   ];
   let html = `<div class="admin-tabs">${types.map(t=>`<button class="admin-tab" onclick="ajouterSection('${attr(pageId)}','${t[0]}')">${t[1]}</button>`).join('')}</div>`;
   html += (page.sections || []).length ? page.sections.map((s,si)=>renderSectionEditor(pageId,s,si)).join('') : '<p class="admin-note" style="text-align:center">Aucune section. Ajoute un bloc ci-dessus.</p>';
