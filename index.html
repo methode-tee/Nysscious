@@ -383,7 +383,7 @@ linear-gradient(
   <footer>
     <div class="footer-logo">Nysscious <span>Kitchn</span></div>
     <div class="footer-by">By Nissa</div>
-    <p id="footer-contact-text">Traiteur & Pâtisserie · Cuisine africaine, fusion & desserts du monde</p>
+    <p id="footer-contact-text"></p>
   </footer>
 
   <div class="modal-overlay" id="modal" onclick="if(event.target===this) closeModal()">
@@ -411,6 +411,12 @@ linear-gradient(
       <div id="admin-content-block">
         <div class="admin-section">
           <h3>Infos générales</h3>
+<label class="admin-label">Texte haut du héro</label>
+<input
+  class="admin-input"
+  id="a-hero-eyebrow"
+  placeholder="Traiteur · Pâtisserie · Cuisine fusion..."
+/>
           <label class="admin-label">Sous-titre accueil</label>
           <input class="admin-input" id="a-hero-sub" placeholder="Cuisine africaine, fusion & desserts du monde" />
           <label class="admin-label">Ville / zone</label>
@@ -530,12 +536,12 @@ function normalizeData(d){
 function defaultData(){
   return {
     infos:{
-      heroSub:'Cuisine africaine, fusion & desserts du monde. Un univers gourmand, généreux et fait maison.',
-      zone:'Paris & Île-de-France',
-      email:'',
-      whatsapp:'',
-      formspree:''
-    },
+  heroEyebrow:'Traiteur & Pâtisserie · Cuisine fusion & desserts du monde',
+  heroSub:'Cuisine africaine, fusion & desserts du monde. Un univers gourmand, généreux et fait maison.',
+  email:'',
+  whatsapp:'',
+  formspree:''
+},
     feed:[
       {
         id:uid('post'),
@@ -641,19 +647,28 @@ function renderPages(data){
   }).join('');
 
   const fc = document.getElementById('footer-contact-text');
-  const email = data.infos.email;
-  const zone = data.infos.zone || 'Paris & Île-de-France';
-  fc.innerHTML = email
-    ? `Traiteur & Pâtisserie · ${escapeHTML(zone)} · <a href="mailto:${attr(email)}">${escapeHTML(email)}</a>`
-    : `Traiteur & Pâtisserie · ${escapeHTML(zone)} · Cuisine africaine, fusion & desserts du monde`;
-}
+
+const email = data.infos.email;
+
+const eyebrow =
+  data.infos.heroEyebrow ||
+  'Traiteur & Pâtisserie · Cuisine fusion & desserts du monde';
+
+fc.innerHTML = email
+  ? `${escapeHTML(eyebrow)} · <a href="mailto:${attr(email)}">${escapeHTML(email)}</a>`
+  : `${escapeHTML(eyebrow)}`;
 
 function renderHomePage(data){
   return `
     <section class="hero">
       <div class="hero-bg"></div>
       <div class="hero-content">
-        <p class="hero-eyebrow">Traiteur & Pâtisserie · ${escapeHTML(data.infos.zone || 'Paris')}</p>
+       <p class="hero-eyebrow">
+  ${escapeHTML(
+    data.infos.heroEyebrow ||
+    'Traiteur & Pâtisserie · Cuisine fusion & desserts du monde'
+  )}
+</p>
         <h1 class="hero-name"><em>Nysscious</em></h1>
         <div class="hero-kitchn">Kitchn</div>
         <p class="hero-bynissa">By Nissa</p>
@@ -972,8 +987,10 @@ function verifierPwd(){
     chargerAdmin();
   }else document.getElementById('pwd-err').style.display = 'block';
 }
+
 function chargerAdmin(){
   const data = getData();
+  document.getElementById('a-hero-eyebrow').value = data.infos.heroEyebrow || '';
   document.getElementById('a-hero-sub').value = data.infos.heroSub || '';
   document.getElementById('a-zone').value = data.infos.zone || '';
   document.getElementById('a-email').value = data.infos.email || '';
@@ -983,8 +1000,10 @@ function chargerAdmin(){
   renderPagesEditors(data.pages);
   populatePageSelect(data.pages);
 }
+
 function sauvegarderInfos(){
   const data = getData();
+  data.infos.heroEyebrow = document.getElementById('a-hero-eyebrow').value.trim();
   data.infos.heroSub = document.getElementById('a-hero-sub').value.trim();
   data.infos.zone = document.getElementById('a-zone').value.trim();
   data.infos.email = document.getElementById('a-email').value.trim();
