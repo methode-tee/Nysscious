@@ -260,6 +260,29 @@
     .text-block p{font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:16px;white-space:pre-line}
     .text-block p:last-child{margin-bottom:0}
 
+
+    /* RECETTES */
+    .recipes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px}
+    .recipe-card{border-radius:24px;overflow:hidden;background:var(--white);border:1px solid var(--border);transition:.3s ease;box-shadow:0 8px 26px rgba(31,26,21,.04);position:relative}
+    .recipe-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+    .recipe-media{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--paper);display:block}
+    .recipe-placeholder{width:100%;aspect-ratio:4/3;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:46px}
+    .recipe-body{padding:20px}
+    .recipe-tag{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);font-weight:700;margin-bottom:8px;display:block}
+    .recipe-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--ink);line-height:1.12;margin-bottom:8px}
+    .recipe-desc{font-size:12px;color:var(--muted);line-height:1.72;margin-bottom:14px;white-space:pre-line}
+    .recipe-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+    .recipe-price{font-family:'Cormorant Garamond',serif;font-size:23px;color:var(--brown);font-weight:600}
+    .recipe-btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:10px 15px;border:1px solid var(--ink);background:var(--ink);color:var(--beige);text-decoration:none;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transition:.25s ease;white-space:nowrap}
+    .recipe-btn:hover{background:transparent;color:var(--ink)}
+    .recipe-free{background:rgba(201,169,110,.12);color:var(--brown);border-color:rgba(201,169,110,.35)}
+    .recipe-premium-badge{position:absolute;top:14px;right:14px;background:rgba(42,30,27,.86);color:var(--gold);border:1px solid rgba(201,169,110,.35);backdrop-filter:blur(10px);border-radius:999px;padding:7px 11px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+    .recipe-lock{display:flex;gap:10px;align-items:flex-start;background:rgba(201,169,110,.09);border:1px solid rgba(201,169,110,.25);border-radius:16px;padding:13px;margin-top:14px}
+    .recipe-lock-icon{font-size:18px;color:var(--gold);line-height:1}
+    .recipe-lock p{font-size:11px;color:var(--muted);line-height:1.55;margin:0}
+    .recipe-full{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;font-size:12px;color:var(--muted);line-height:1.75;white-space:pre-line}
+    .recipe-full-title{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--ink);margin-bottom:7px}
+
     /* FILTER */
     .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
     .filter-btn{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:8px 16px;border-radius:999px;border:1px solid var(--border);background:var(--white);color:var(--muted);transition:.2s ease}
@@ -551,6 +574,9 @@ function defaultData(){
       { id:'desserts', nom:'Desserts', icon:'🍰', fixe:false, sections:[
         { id:uid('section'), type:'plats', titre:'Desserts & douceurs', intro:'Gâteaux, verrines, box sucrées et créations événementielles.', groupByRubrique:true, plats:[] }
       ]},
+      { id:'recettes', nom:'Recettes', icon:'📖', fixe:false, sections:[
+        { id:uid('section'), type:'recettes', titre:'Recettes', intro:'Recettes gratuites et créations premium à débloquer.', recettes:[] }
+      ]},
       { id:'galerie', nom:'Galerie', icon:'📸', fixe:false, sections:[
         { id:uid('section'), type:'photos', titre:'Galerie', intro:'Instants, textures, dressages et inspirations.', cols:2, photos:[] }
       ]},
@@ -777,6 +803,7 @@ function renderSectionBody(s){
   switch(s.type){
     case 'plats': return renderPlatsSection(s);
     case 'photos': return renderPhotosSection(s);
+    case 'recettes': return renderRecettesSection(s);
     case 'tips': return renderTipsSection(s);
     case 'tarifs': return renderTarifsSection(s);
     case 'contact': return renderContactSection(s);
@@ -917,6 +944,48 @@ function renderPhotosSection(s){
     return `<div class="photo-item ${ratio} reveal" onclick="openGalleryMedia('${encoded}','${attr(p.titre || '')}','${attr(p.description || '')}')">${media}${(p.titre || p.description) ? `<div class="photo-caption"><div class="photo-caption-title">${escapeHTML(p.titre)}</div><div class="photo-caption-desc">${escapeHTML(p.description)}</div></div>` : ''}</div>`;
   }).join('')}</div>`;
 }
+
+function renderRecettesSection(s){
+  const recettes = s.recettes || [];
+  if(!recettes.length) return `<div class="empty"><span class="eicon">📖</span>Aucune recette. Ajoute-en depuis l'admin.</div>`;
+  return `<div class="recipes-grid">${recettes.map(r => renderRecipeCard(r)).join('')}</div>`;
+}
+function renderRecipeCard(r){
+  const src = r.photoData || r.photo || '';
+  const img = src ? `<img class="recipe-media" src="${attr(src)}" alt="${attr(r.titre)}" loading="lazy" />` : `<div class="recipe-placeholder">${escapeHTML(r.emoji || '📖')}</div>`;
+  const isPaid = !!r.payante;
+  const price = r.prix || '0€';
+  const stripe = r.stripe || '';
+  const full = r.contenu || '';
+  return `
+    <article class="recipe-card reveal">
+      ${isPaid ? `<div class="recipe-premium-badge">Premium</div>` : ''}
+      ${img}
+      <div class="recipe-body">
+        ${r.categorie ? `<span class="recipe-tag">${escapeHTML(r.categorie)}</span>` : ''}
+        <h3 class="recipe-title">${escapeHTML(r.titre || 'Recette')}</h3>
+        ${r.description ? `<p class="recipe-desc">${escapeHTML(r.description)}</p>` : ''}
+        ${isPaid ? `
+          <div class="recipe-lock">
+            <div class="recipe-lock-icon">🔒</div>
+            <p>Recette complète réservée après achat : étapes, quantités, astuces et dressage.</p>
+          </div>
+          <div class="recipe-meta">
+            <span class="recipe-price">${escapeHTML(price)}</span>
+            ${stripe ? `<a class="recipe-btn" href="${attr(stripe)}" target="_blank" rel="noopener">Débloquer</a>` : `<span class="recipe-btn">Lien Stripe à ajouter</span>`}
+          </div>
+        ` : `
+          ${full ? `<div class="recipe-full"><div class="recipe-full-title">Recette complète</div>${escapeHTML(full)}</div>` : ''}
+          <div class="recipe-meta">
+            <span class="recipe-price">Gratuit</span>
+            <span class="recipe-btn recipe-free">Disponible</span>
+          </div>
+        `}
+      </div>
+    </article>
+  `;
+}
+
 function renderTipsSection(s){
   const tips = s.tips || [];
   if(!tips.length) return `<div class="empty"><span class="eicon">👩‍🍳</span>Aucun conseil. Ajoute-en depuis l'admin.</div>`;
@@ -1199,7 +1268,7 @@ function chargerEditeurPage(pageId){
   const data = getData(); const page = data.pages.find(p=>p.id===pageId); if(!page) return;
   const wrap = document.getElementById('page-content-editor');
   const types = [
-    ['plats','🍽️ Plats'],['photos','📸 Photos/Vidéos'],['tips','💡 Tips'],['tarifs','❋ Tarifs'],['contact','✉️ Contact'],['texte','📝 Texte'],['liens','🔗 Liens']
+    ['plats','🍽️ Plats'],['recettes','📖 Recettes'],['photos','📸 Photos/Vidéos'],['tips','💡 Tips'],['tarifs','❋ Tarifs'],['contact','✉️ Contact'],['texte','📝 Texte'],['liens','🔗 Liens']
   ];
   let html = `<div class="admin-tabs">${types.map(t=>`<button class="admin-tab" onclick="ajouterSection('${attr(pageId)}','${t[0]}')">${t[1]}</button>`).join('')}</div>`;
   html += (page.sections || []).length ? page.sections.map((s,si)=>renderSectionEditor(pageId,s,si)).join('') : '<p class="admin-note" style="text-align:center">Aucune section. Ajoute un bloc ci-dessus.</p>';
@@ -1210,6 +1279,7 @@ async function ajouterSection(pageId,type){
   const s = {id:uid('section'),type,titre:'',intro:''};
   if(type==='plats'){ s.groupByRubrique = true; s.plats=[]; }
   if(type==='photos'){ s.cols=2; s.photos=[]; }
+  if(type==='recettes') s.recettes=[];
   if(type==='tips') s.tips=[];
   if(type==='tarifs') s.tarifs=[];
   if(type==='liens') s.liens=[];
@@ -1223,6 +1293,7 @@ function renderSectionEditor(pageId,s,si){
     <label class="admin-label">Introduction optionnelle</label><textarea class="admin-textarea" style="min-height:58px" onchange="updateSection('${attr(pageId)}',${si},'intro',this.value)" placeholder="Petite phrase d'intro…">${escapeHTML(s.intro)}</textarea>
     ${s.type==='plats'?renderPlatsEditor(pageId,si,s):''}
     ${s.type==='photos'?renderPhotosEditor(pageId,si,s):''}
+    ${s.type==='recettes'?renderRecettesEditor(pageId,si,s.recettes||[]):''}
     ${s.type==='tips'?renderTipsEditor(pageId,si,s.tips||[]):''}
     ${s.type==='tarifs'?renderTarifsEditor(pageId,si,s.tarifs||[]):''}
     ${s.type==='liens'?renderLiensEditor(pageId,si,s.liens||[]):''}
@@ -1264,6 +1335,56 @@ async function ajouterPlat(pageId,si){ const data=getData(); const s=data.pages.
 async function updatePlat(pageId,si,pi,key,val){ const data=getData(); const p=data.pages.find(p=>p.id===pageId)?.sections?.[si]?.plats?.[pi]; if(!p) return; p[key]=val; await saveData(data); renderApp(); }
 async function supprimerPlat(pageId,si,pi){ if(!confirm('Supprimer ?')) return; const data=getData(); const s=data.pages.find(p=>p.id===pageId)?.sections?.[si]; if(!s) return; s.plats.splice(pi,1); await saveData(data); chargerEditeurPage(pageId); renderApp(); }
 function uploadPlatPhoto(pageId,si,pi,input){ const file=input.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=async e=>{ const data=getData(); const p=data.pages.find(p=>p.id===pageId)?.sections?.[si]?.plats?.[pi]; if(!p) return; p.photoData=e.target.result; await saveData(data); chargerEditeurPage(pageId); renderApp(); }; reader.readAsDataURL(file); }
+
+
+function renderRecettesEditor(pageId,si,recettes){
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0"><span class="item-title">${recettes.length} recette(s)</span><button class="chip" onclick="ajouterRecette('${attr(pageId)}',${si})">+ Recette</button></div>${recettes.map((r,ri)=>renderRecetteEditor(pageId,si,ri,r)).join('')}`;
+}
+function renderRecetteEditor(pageId,si,ri,r){
+  const src = r.photoData || r.photo || '';
+  return `<div class="item-editor" style="background:var(--white)">
+    <div class="item-editor-header"><span class="item-title">Recette ${ri+1}</span><button class="btn btn-danger" onclick="supprimerRecette('${attr(pageId)}',${si},${ri})" style="padding:4px 9px;font-size:9px">✕</button></div>
+    <div class="upload-zone" onclick="document.getElementById('up-recette-${attr(pageId)}-${si}-${ri}').click()">${src ? `<img class="mini-preview" src="${attr(src)}" />` : '<div>📖</div><p>Uploader une photo de recette</p>'}</div>
+    <input type="file" accept="image/*" id="up-recette-${attr(pageId)}-${si}-${ri}" class="upload-input" onchange="uploadRecettePhoto('${attr(pageId)}',${si},${ri},this)" />
+    <input class="admin-input" value="${attr(r.photo)}" placeholder="Ou URL photo" onchange="updateRecette('${attr(pageId)}',${si},${ri},'photo',this.value)" />
+    <div class="admin-row">
+      <input class="admin-input" value="${attr(r.emoji)}" placeholder="Emoji 📖" onchange="updateRecette('${attr(pageId)}',${si},${ri},'emoji',this.value)" />
+      <input class="admin-input" value="${attr(r.categorie)}" placeholder="Catégorie ex: Dessert, Brunch…" onchange="updateRecette('${attr(pageId)}',${si},${ri},'categorie',this.value)" />
+    </div>
+    <input class="admin-input" value="${attr(r.titre)}" placeholder="Titre de la recette" onchange="updateRecette('${attr(pageId)}',${si},${ri},'titre',this.value)" />
+    <textarea class="admin-textarea" placeholder="Description courte / aperçu visible" onchange="updateRecette('${attr(pageId)}',${si},${ri},'description',this.value)">${escapeHTML(r.description)}</textarea>
+    <textarea class="admin-textarea" style="min-height:120px" placeholder="Recette complète (visible seulement si recette gratuite)" onchange="updateRecette('${attr(pageId)}',${si},${ri},'contenu',this.value)">${escapeHTML(r.contenu)}</textarea>
+    <label style="display:flex;gap:8px;align-items:center;font-size:12px;margin:8px 0 10px">
+      <input type="checkbox" ${r.payante?'checked':''} onchange="updateRecette('${attr(pageId)}',${si},${ri},'payante',this.checked)" style="accent-color:var(--gold)"> Recette payante / verrouillée
+    </label>
+    <div class="admin-row">
+      <input class="admin-input" value="${attr(r.prix)}" placeholder="Prix ex: 4,90€" onchange="updateRecette('${attr(pageId)}',${si},${ri},'prix',this.value)" />
+      <input class="admin-input" value="${attr(r.stripe)}" placeholder="Lien Stripe Payment Link" onchange="updateRecette('${attr(pageId)}',${si},${ri},'stripe',this.value)" />
+    </div>
+    <p class="admin-note">Pour une recette payante, le contenu complet reste caché. Le bouton “Débloquer” envoie vers le lien Stripe.</p>
+  </div>`;
+}
+async function ajouterRecette(pageId,si){
+  const data=getData(); const s=data.pages.find(p=>p.id===pageId)?.sections?.[si]; if(!s) return;
+  s.recettes=s.recettes||[];
+  s.recettes.push({emoji:'📖',titre:'',categorie:'',description:'',contenu:'',photo:'',photoData:'',payante:false,prix:'',stripe:''});
+  await saveData(data); chargerEditeurPage(pageId); renderApp();
+}
+async function updateRecette(pageId,si,ri,key,val){
+  const data=getData(); const r=data.pages.find(p=>p.id===pageId)?.sections?.[si]?.recettes?.[ri]; if(!r) return;
+  r[key]=val; await saveData(data); renderApp();
+}
+async function supprimerRecette(pageId,si,ri){
+  if(!confirm('Supprimer cette recette ?')) return;
+  const data=getData(); const s=data.pages.find(p=>p.id===pageId)?.sections?.[si]; if(!s) return;
+  s.recettes.splice(ri,1); await saveData(data); chargerEditeurPage(pageId); renderApp();
+}
+function uploadRecettePhoto(pageId,si,ri,input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async e=>{ const data=getData(); const r=data.pages.find(p=>p.id===pageId)?.sections?.[si]?.recettes?.[ri]; if(!r) return; r.photoData=e.target.result; await saveData(data); chargerEditeurPage(pageId); renderApp(); };
+  reader.readAsDataURL(file);
+}
 
 function renderPhotosEditor(pageId,si,s){
   const photos=s.photos||[];
